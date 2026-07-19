@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypertensive Crisis: Urgency vs Emergency</title>
+<style>
+  :root{
+    --bg:#0A0D10;
+    --bg2:#0E1316;
+    --ink:#EDEFEE;
+    --slate:#93A0A6;
+    --amber:#E3A23C;
+    --amber-glow:rgba(227,162,60,0.35);
+    --red:#E4534B;
+    --red-glow:rgba(228,83,75,0.4);
+    --teal:#3FBFAE;
+    --teal-glow:rgba(63,191,174,0.35);
+    --line:rgba(255,255,255,0.09);
+    --panel:rgba(255,255,255,0.035);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(228,83,75,0.14), transparent 60%),
+      radial-gradient(ellipse 800px 500px at 100% 10%, rgba(227,162,60,0.10), transparent 60%),
+      radial-gradient(ellipse 1000px 700px at 50% 100%, rgba(63,191,174,0.06), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Georgia','Iowan Old Style',serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  .sans{font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;}
+
+  /* ---------- HERO / ECG MOTION GRAPHIC ---------- */
+  header{
+    position:relative;
+    padding:64px 24px 40px;
+    max-width:960px;
+    margin:0 auto;
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .ecg-wrap{
+    position:relative;
+    height:100px;
+    margin-bottom:28px;
+    opacity:0.9;
+  }
+  .ecg-wrap svg{ width:200%; height:100%; display:block; }
+  .ecg-line{
+    fill:none;
+    stroke:var(--red);
+    stroke-width:2.2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    filter:drop-shadow(0 0 6px var(--red-glow)) drop-shadow(0 0 14px var(--red-glow));
+    animation:scrollECG 6s linear infinite;
+  }
+  @keyframes scrollECG{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+  .ecg-wrap::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(90deg, var(--bg) 0%, transparent 6%, transparent 94%, var(--bg) 100%);
+    pointer-events:none;
+  }
+
+  .eyebrow{
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    font-size:11.5px;
+    color:var(--teal);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--red);
+    box-shadow:0 0 8px var(--red-glow);
+    animation:pulseDot 1.6s ease-in-out infinite;
+  }
+  @keyframes pulseDot{
+    0%,100%{ opacity:1; transform:scale(1); }
+    50%{ opacity:.4; transform:scale(0.7); }
+  }
+  h1{
+    font-size:clamp(30px,5.5vw,48px);
+    margin:0 0 14px;
+    line-height:1.08;
+    background:linear-gradient(100deg, #FFFFFF 30%, var(--slate) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .subtitle{
+    color:var(--slate);
+    font-size:16.5px;
+    max-width:620px;
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+
+  main{
+    max-width:960px;
+    margin:0 auto;
+    padding:40px 24px 100px;
+  }
+
+  /* ---------- TRIAGE CARDS ---------- */
+  .triage{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    margin:36px 0 56px;
+  }
+  @media (max-width:640px){ .triage{grid-template-columns:1fr;} }
+  .triage-card{
+    position:relative;
+    border-radius:10px;
+    padding:26px 24px 22px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    backdrop-filter:blur(6px);
+    overflow:hidden;
+    transition:transform .35s ease, border-color .35s ease;
+  }
+  .triage-card:hover{ transform:translateY(-3px); }
+  .triage-card::before{
+    content:"";
+    position:absolute; inset:-1px;
+    border-radius:10px;
+    padding:1px;
+    opacity:0;
+    transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .triage-card.urgency::before{ background:linear-gradient(135deg, var(--amber), transparent 60%); -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+  .triage-card.emergency::before{ background:linear-gradient(135deg, var(--red), transparent 60%); -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+  .triage-card:hover::before{ opacity:1; }
+  .triage-card.urgency:hover{ border-color:rgba(227,162,60,0.4); box-shadow:0 0 40px -12px var(--amber-glow); }
+  .triage-card.emergency:hover{ border-color:rgba(228,83,75,0.4); box-shadow:0 0 40px -12px var(--red-glow); }
+
+  .triage-label{
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    font-weight:700;
+    margin-bottom:10px;
+    display:flex; align-items:center; gap:7px;
+  }
+  .urgency .triage-label{ color:var(--amber); }
+  .emergency .triage-label{ color:var(--red); }
+  .pulse-chip{
+    width:7px;height:7px;border-radius:50%;
+  }
+  .urgency .pulse-chip{ background:var(--amber); box-shadow:0 0 8px var(--amber-glow); animation:pulseDot 2.4s ease-in-out infinite; }
+  .emergency .pulse-chip{ background:var(--red); box-shadow:0 0 8px var(--red-glow); animation:pulseDot 1.1s ease-in-out infinite; }
+
+  .triage-bp{ font-size:32px; font-weight:700; margin-bottom:8px; letter-spacing:-0.5px; }
+  .triage-desc{ font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif; font-size:14px; color:var(--slate); }
+  .triage-goal{
+    margin-top:16px; padding-top:14px;
+    border-top:1px dashed var(--line);
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    font-size:13.5px; color:#D7DBDA;
+  }
+
+  /* ---------- SCROLL REVEAL SECTIONS ---------- */
+  section{
+    margin-bottom:56px;
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  section.in-view{ opacity:1; transform:translateY(0); }
+
+  h2{
+    font-size:23px;
+    margin:0 0 8px;
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+  }
+  .num{
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    color:var(--teal);
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.05em;
+  }
+  .section-note{
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    color:var(--slate);
+    font-size:14px;
+    margin-bottom:20px;
+  }
+
+  ul, ol{ padding-left:22px; margin:10px 0; }
+  li{ margin-bottom:7px; }
+  li::marker{ color:var(--teal); }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    font-size:14px;
+    margin-top:10px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  caption{
+    text-align:left;
+    font-family:'Georgia',serif;
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:10px;
+    color:var(--ink);
+  }
+  th, td{
+    text-align:left;
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  th{
+    font-size:11px;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    color:var(--slate);
+    background:rgba(255,255,255,0.03);
+  }
+  tr:last-child td{ border-bottom:none; }
+  tr td{ transition:background .25s ease; }
+  tr:hover td{ background:rgba(63,191,174,0.05); }
+
+  .callout{
+    background:linear-gradient(135deg, rgba(63,191,174,0.08), rgba(63,191,174,0.02));
+    border-left:3px solid var(--teal);
+    padding:16px 20px;
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    font-size:14px;
+    border-radius:0 8px 8px 0;
+    margin:18px 0;
+  }
+  .callout strong{ color:var(--teal); }
+
+  .warn{
+    background:linear-gradient(135deg, rgba(228,83,75,0.10), rgba(228,83,75,0.02));
+    border-left:3px solid var(--red);
+    padding:16px 20px;
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    font-size:14px;
+    border-radius:0 8px 8px 0;
+    margin:18px 0;
+  }
+  .warn strong{ color:var(--red); }
+
+  .drug-tag{
+    display:inline-block;
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    font-size:10.5px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:20px;
+    background:rgba(63,191,174,0.15);
+    color:var(--teal);
+    border:1px solid rgba(63,191,174,0.3);
+  }
+
+  /* recall band with animated gradient */
+  .recall{
+    position:relative;
+    border-radius:14px;
+    padding:28px 26px;
+    background:linear-gradient(120deg, rgba(228,83,75,0.14), rgba(227,162,60,0.12), rgba(63,191,174,0.12), rgba(228,83,75,0.14));
+    background-size:300% 300%;
+    animation:gradientShift 10s ease infinite;
+    border:1px solid var(--line);
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    font-size:15px;
+  }
+  @keyframes gradientShift{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
+  }
+  .recall b.u{ color:var(--amber); }
+  .recall b.e{ color:var(--red); }
+
+  footer{
+    max-width:960px;
+    margin:0 auto;
+    padding:28px 24px;
+    color:var(--slate);
+    font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+    font-size:12.5px;
+    border-top:1px solid var(--line);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .ecg-line, .dot, .pulse-chip, .recall{ animation:none !important; }
+    section{ opacity:1; transform:none; transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="ecg-wrap">
+    <svg viewBox="0 0 1000 100" preserveAspectRatio="none">
+      <path class="ecg-line" d="
+        M0,50 L60,50 L75,50 L85,20 L95,80 L105,10 L115,50 L130,50 L160,50
+        L220,50 L235,50 L245,20 L255,80 L265,10 L275,50 L290,50 L320,50
+        L380,50 L395,50 L405,20 L415,80 L425,10 L435,50 L450,50 L480,50
+        L540,50 L555,50 L565,20 L575,80 L585,10 L595,50 L610,50 L640,50
+        L700,50 L715,50 L725,20 L735,80 L745,10 L755,50 L770,50 L800,50
+        L860,50 L875,50 L885,20 L895,80 L905,10 L915,50 L930,50 L960,50
+        L1020,50 L1035,50 L1045,20 L1055,80 L1065,10 L1075,50 L1090,50 L1120,50
+        L1180,50 L1195,50 L1205,20 L1215,80 L1225,10 L1235,50 L1250,50 L1280,50
+        L1340,50 L1355,50 L1365,20 L1375,80 L1385,10 L1395,50 L1410,50 L1440,50
+        L1500,50 L1515,50 L1525,20 L1535,80 L1545,10 L1555,50 L1570,50 L1600,50
+        L1660,50 L1675,50 L1685,20 L1695,80 L1705,10 L1715,50 L1730,50 L1760,50
+        L1820,50 L1835,50 L1845,20 L1855,80 L1865,10 L1875,50 L1890,50 L1920,50
+        L1980,50 L1995,50 L2000,50
+      "/>
+    </svg>
+  </div>
+  <div class="eyebrow"><span class="dot"></span>Nursing / Cardiovascular Emergencies · Study Notes</div>
+  <h1>Management of Hypertensive Crisis</h1>
+  <p class="subtitle">A working reference distinguishing hypertensive urgency from emergency — how to tell them apart, and how each is treated.</p>
+</header>
+
+<main>
+
+  <div class="triage">
+    <div class="triage-card urgency">
+      <div class="triage-label"><span class="pulse-chip"></span>Hypertensive Urgency</div>
+      <div class="triage-bp">≥ 180 / 120 mmHg</div>
+      <div class="triage-desc">Severe BP elevation with <strong>no</strong> acute end-organ damage.</div>
+      <div class="triage-goal">Goal: lower BP gradually over <strong>24–48 hours</strong> using oral agents, usually as an outpatient or observed setting.</div>
+    </div>
+    <div class="triage-card emergency">
+      <div class="triage-label"><span class="pulse-chip"></span>Hypertensive Emergency</div>
+      <div class="triage-bp">≥ 180 / 120 mmHg</div>
+      <div class="triage-desc">Severe BP elevation <strong>with</strong> acute, ongoing end-organ damage.</div>
+      <div class="triage-goal">Goal: lower MAP by <strong>≤ 25% within the first hour</strong> using IV agents in an ICU/critical care setting.</div>
+    </div>
+  </div>
+
+  <section>
+    <h2><span class="num">01</span> Telling Them Apart</h2>
+    <p class="section-note">The BP number alone does not distinguish them — the presence of end-organ damage does.</p>
+    <table>
+      <caption>Comparison</caption>
+      <tr><th style="width:22%">Feature</th><th>Urgency</th><th>Emergency</th></tr>
+      <tr><td>Blood pressure</td><td>Severely elevated (≥180/120)</td><td>Severely elevated (≥180/120)</td></tr>
+      <tr><td>End-organ damage</td><td>Absent</td><td>Present and progressing</td></tr>
+      <tr><td>Symptoms</td><td>Headache, anxiety, epistaxis — often mild or absent</td><td>Chest pain, dyspnea, altered mental status, visual change, focal neuro deficit</td></tr>
+      <tr><td>Setting</td><td>Outpatient / ED observation</td><td>ICU / critical care with arterial line & continuous monitoring</td></tr>
+      <tr><td>Route</td><td>Oral antihypertensives</td><td>IV titratable antihypertensives</td></tr>
+      <tr><td>Speed of BP reduction</td><td>Over 24–48 hours</td><td>≤25% MAP reduction in first hour, then gradual over 24–48h</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span> Signs of End-Organ Damage</h2>
+    <p class="section-note">Any one of these, in the setting of severe hypertension, reclassifies the patient as an emergency.</p>
+    <ul>
+      <li><strong>Neurologic:</strong> encephalopathy, altered mental status, stroke symptoms, seizures</li>
+      <li><strong>Cardiac:</strong> acute coronary syndrome, acute heart failure / pulmonary edema</li>
+      <li><strong>Vascular:</strong> aortic dissection</li>
+      <li><strong>Renal:</strong> acute kidney injury, hematuria</li>
+      <li><strong>Ocular:</strong> papilledema, retinal hemorrhages (hypertensive retinopathy)</li>
+      <li><strong>Obstetric:</strong> eclampsia / severe preeclampsia</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span> Nursing Assessment — First Steps</h2>
+    <ol>
+      <li>Recheck BP manually in both arms, appropriate cuff size, patient seated/resting</li>
+      <li>Full neuro check: LOC, pupils, speech, motor/sensory, visual fields</li>
+      <li>Cardiac & respiratory assessment: chest pain, dyspnea, crackles, JVD, edema</li>
+      <li>12-lead ECG, obtain IV access, send labs (renal function, troponin, urinalysis)</li>
+      <li>Fundoscopic exam if available (papilledema/hemorrhages)</li>
+      <li>Ask about medication adherence, illicit drug use (cocaine, amphetamines), pregnancy status</li>
+    </ol>
+    <div class="callout"><strong>Key point:</strong> Symptoms drive triage, not the BP number itself. Two patients can both present at 210/125 — one goes home on an oral agent, the other goes to the ICU on a nitroprusside drip.</div>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span> Managing Hypertensive Urgency</h2>
+    <p class="section-note">No IV drips, no ICU. Oral agents, reassessment in hours, and same/next-day follow-up.</p>
+    <table>
+      <caption>Common oral agents</caption>
+      <tr><th>Drug</th><th>Class</th><th>Notes</th></tr>
+      <tr><td>Captopril</td><td>ACE inhibitor</td><td>Fast onset (~15–30 min); avoid in pregnancy, renal artery stenosis</td></tr>
+      <tr><td>Labetalol (oral)</td><td>Alpha/beta blocker</td><td>Good if tachycardic; avoid in asthma/COPD, bradycardia</td></tr>
+      <tr><td>Clonidine</td><td>Central alpha-2 agonist</td><td>Watch for rebound hypertension if stopped abruptly; sedation</td></tr>
+      <tr><td>Amlodipine</td><td>Calcium channel blocker</td><td>Slower onset; good for outpatient titration</td></tr>
+    </table>
+    <div class="warn"><strong>Avoid:</strong> Sublingual/rapid-acting nifedipine — historically used but linked to precipitous, uncontrolled BP drops causing stroke and MI. No longer recommended.</div>
+    <ul>
+      <li>Reduce BP gradually over 24–48 hours, not in the ED in one sitting</li>
+      <li>Discharge teaching: medication adherence, low-sodium diet, home BP monitoring</li>
+      <li>Arrange follow-up within 24–72 hours</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span> Managing Hypertensive Emergency</h2>
+    <p class="section-note">ICU admission, arterial line for continuous BP monitoring, IV titratable agents. The specific drug is chosen based on <em>which organ</em> is affected.</p>
+    <table>
+      <caption>IV agents by clinical scenario</caption>
+      <tr><th>Scenario</th><th>Preferred agent(s)</th><th>Why</th></tr>
+      <tr><td>General / most cases</td><td>Nicardipine, Clevidipine <span class="drug-tag">CCB</span></td><td>Smooth, titratable, minimal reflex tachycardia</td></tr>
+      <tr><td>Aortic dissection</td><td>Esmolol or Labetalol first, then Nitroprusside</td><td>Must reduce heart rate/shear stress before/along with BP — beta-blockade first is critical</td></tr>
+      <tr><td>Acute pulmonary edema / heart failure</td><td>Nitroglycerin, Nitroprusside</td><td>Venodilation reduces preload</td></tr>
+      <tr><td>Acute coronary syndrome</td><td>Nitroglycerin, Labetalol, Esmolol</td><td>Reduces myocardial oxygen demand</td></tr>
+      <tr><td>Hypertensive encephalopathy / ischemic stroke</td><td>Labetalol, Nicardipine</td><td>Avoid excessive drops that worsen cerebral perfusion</td></tr>
+      <tr><td>Preeclampsia / eclampsia</td><td>Labetalol, Hydralazine, Magnesium sulfate (seizure prophylaxis)</td><td>Nitroprusside avoided — fetal cyanide risk</td></tr>
+      <tr><td>Pheochromocytoma / cocaine toxicity</td><td>Phentolamine, Benzodiazepines</td><td>Alpha-blockade before beta-blockade — unopposed alpha stimulation is dangerous</td></tr>
+    </table>
+    <div class="warn"><strong>Nitroprusside caution:</strong> Effective but carries risk of cyanide/thiocyanate toxicity with prolonged use or renal impairment — monitor closely, limit duration.</div>
+    <div class="callout"><strong>The 25% rule:</strong> Reduce mean arterial pressure by no more than 25% in the first hour. Dropping BP too fast can cause cerebral, coronary, or renal hypoperfusion — the treatment itself can cause a stroke or MI if rushed. Exceptions: aortic dissection (reduce faster, target SBP ~100–120 within minutes) and sometimes eclampsia.</div>
+  </section>
+
+  <section>
+    <h2><span class="num">06</span> Nursing Priorities During Treatment</h2>
+    <ul>
+      <li>Continuous BP monitoring (arterial line preferred) — titrate IV drip per protocol/order</li>
+      <li>Neuro checks every 15–30 min initially; watch for new deficits (over- or under-treatment)</li>
+      <li>Strict intake/output, daily weights if heart failure involved</li>
+      <li>Cardiac monitoring/telemetry throughout</li>
+      <li>Have emergency equipment and reversal/backup drugs ready at bedside</li>
+      <li>Document trends, not just single readings — the trajectory of BP matters</li>
+      <li>Patient education begins even in acute phase: this sets up adherence after discharge</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="num">07</span> Quick Recall</h2>
+    <div class="recall">
+      <b class="u">Urgency</b> = high BP, no damage, oral drugs, days to fix.<br>
+      <b class="e">Emergency</b> = high BP, active damage, IV drugs, ICU, minutes to hours, drop MAP ≤25% in hour one — except dissection, which needs faster control.
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Study reference only — always follow current institutional protocols and prescriber orders. Not a substitute for clinical guidelines (ACC/AHA).
+</footer>
+
+<script>
+  const sections = document.querySelectorAll('section');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.classList.add('in-view');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  sections.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>
